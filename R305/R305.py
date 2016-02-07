@@ -1,0 +1,6 @@
+header = [0xef,0x01]
+address = [0xff,0xff,0xff,0xff]
+
+
+def generateHeader():
+    return header+address
