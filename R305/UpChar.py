@@ -41,5 +41,5 @@ def parse(s):
 
 
 
-def UpChar():
+def getHeader():
     return generateHeader()+[0x01, 0x00, 0x04 ,0x08, 0x01, 0x00, 0x0e]

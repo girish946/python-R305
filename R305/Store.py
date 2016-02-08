@@ -39,5 +39,11 @@ def parse(s):
 
 
 
-def Store():
-    return generateHeader()+[0x01, 0x00, 0x06 ,0x06, 0x01, 0x00, 0x00, 0x00, 0x0e]
+def getHeader(buf, pageid):
+    data =[0x01, 0x00, 0x06 ,0x06,buf, pageid/100, pageid%100]
+    csum = sum(data)
+    cs1 = csum/100
+    cs2 = csum%100
+    data.append(cs1)
+    data.append(cs2)
+    return generateHeader()+ data

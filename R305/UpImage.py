@@ -41,5 +41,5 @@ def parse(s):
 
 
 
-def UpImage():
+def getHeader():
     return generateHeader()+[0x01, 0x00, 0x03, 0x0a, 0x00, 0x0e]

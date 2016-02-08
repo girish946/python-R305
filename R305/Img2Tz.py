@@ -1,5 +1,5 @@
 from R305 import generateHeader, header, address
-import DataPacket
+
 
 identifire = {1:"command packet",
               2: "data packet",
@@ -46,5 +46,8 @@ def parse(s):
 
 
 
-def Img2Tz():
-    return generateHeader()+[0x01, 0x00, 0x04, 0x02, 0x01, 0x00, 0x08]
+def getHeader(buf):
+    if (buf == 0x01):
+        return generateHeader()+[0x01, 0x00, 0x04, 0x02, buf, 0x00, 0x08]
+    elif(buf == 0x02):
+        return generateHeader()+[0x01, 0x00, 0x04, 0x02, buf, 0x00, 0x09]

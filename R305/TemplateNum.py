@@ -1,3 +1,4 @@
+from struct import unpack
 from R305 import generateHeader, header, address
 
 identifire = {1:"command packet",
@@ -14,27 +15,19 @@ def parse(s):
     recived_id = s[6]
     recived_length =s[7:9]
     recived_c_code= s[9]
-    recived_template_no = s[10:11]
+    recived_template_no = s[10:12]
     if( header == [int(ord(c)) for c in recived_header]):
         if( address == [int(ord(c)) for c in recived_address]):
 
             print "address and header ok"
-            
-            #print hex(ord(recived_id))
-            #print int(ord(recived_id))
-            #print identifire
-
             print(identifire[int(ord(recived_id)) ])
-
-            #print ([hex(ord(c)) for c in recived_length])
-
             print (confirmation_codes[int(ord(recived_c_code))])
-            
-            if recived_c_code == 0:
-                return recived_template_no
+            print("template number is: "+str(256*ord(recived_template_no[0]) + ord(recived_template_no[1])))
+            if int(ord(recived_c_code)) == 0x00:
+                return 256*ord(recived_template_no[0]) + ord(recived_template_no[1])
             else:
                 return "error while reciving data"
+                
 
-
-def TemplateNum():
+def getHeader():
     return generateHeader()+[0x01, 0x00,0x03,0x1d,0x00,0x21]

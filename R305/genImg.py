@@ -11,7 +11,7 @@ confirmation_codes = {0:"finger collection success",
                       3:"fail to collect finger"}
 
 
-def genImg():
+def getHeader():
     return generateHeader()+[0x01,0x00,0x03,0x01,0x00,0x05]
 
 
