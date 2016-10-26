@@ -1,14 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
 from R305 import generateHeader, header, address
-import DataPacket
 
 identifire = {1:"command packet",
               2: "data packet",
               7:"acknokedge packet",
               8:"end of data packte"}
 
-confirmation_codes = {0:"ready to transfer the following data packet.",
+confirmation_codes = {0:"Found Matching Finger",
                       1:"error while reciving packet",
-                      0x0f:"faild to transfer the data packet."}
+                      0x09:"No Matching in the Library"}
 
 
 
@@ -19,8 +22,9 @@ def parse(s):
     recived_id = s[6]
     recived_length = s[7:9]
     recived_c_code = s[9]
-    recived_c_sum = s[10:11]
-    recived_data_packet = s[12:]
+    recived_Page_id = s[10:11]
+    recived_Match_store= s[11:12]
+    recived_c_sum = s[12:13]
     if( header == [int(ord(c)) for c in recived_header]):
         if( address == [int(ord(c)) for c in recived_address]):
 
@@ -35,11 +39,20 @@ def parse(s):
             #print ([hex(ord(c)) for c in recived_length])
 
             print (confirmation_codes[int(ord(recived_c_code))])
-            DataPacket.parse(recived_data_packet)
+            print("Page id :"+str(int(ord(recived_Page_id))))
+            print("Match Store"+str(int(ord(recived_Match_store))))
             
-    return "ok"
+    return int(ord(recived_Page_id)), int(ord(recived_Match_store))
 
 
 
-def getHeader():
-    return generateHeader()+[0x01, 0x00, 0x03, 0x0a, 0x00, 0x0e]
+def getHeader(buf,startpage, pageno):
+    data = [0x01, 0x00, 0x08 ,0x04, buf]
+    startpage1  = startpage / 100
+    startpage2 = startpage % 100
+    pageno1 = pageno / 100
+    pageno2 = pageno % 100
+    csum = sum(data+[startpage1, startpage2, pageno1, pageno2])
+    csum1 = csum / 100
+    csum2 = csum % 100
+    return generateHeader()+ data + [startpage1, startpage2, pageno1, pageno2, csum1, csum2]

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from R305 import generateHeader, header, address
 
 
@@ -6,9 +9,15 @@ identifire = {1:"command packet",
               7:"acknokedge packet",
               8:"end of data packte"}
 
-confirmation_codes = {0:"Empty success",
+confirmation_codes = {0:"generate character file complete",
                       1:"error while reciving packet",
-                      0x11:"fail to clear finger library."}
+                      0x06:"""fail to generate character file due to the
+                      over-distorterly fingerprint image""",
+                      0x07:"""failed to generate characterfile due to lackness
+                      of character or point or over smallness
+                      of the fingerprint image""",
+                      0x15:"""fail to0 generate image file for the
+                      lackness of valid primary image."""}
 
 
 
@@ -36,9 +45,12 @@ def parse(s):
             print (confirmation_codes[int(ord(recived_c_code))])
             return confirmation_codes[int(ord(recived_c_code))]
             
-    return "error"
+    return "ok"
 
 
 
-def getHeader():
-        return generateHeader()+[0x01, 0x00, 0x03, 0x0d, 0x00, 0x11]
+def getHeader(buf):
+    if (buf == 0x01):
+        return generateHeader()+[0x01, 0x00, 0x04, 0x02, buf, 0x00, 0x08]
+    elif(buf == 0x02):
+        return generateHeader()+[0x01, 0x00, 0x04, 0x02, buf, 0x00, 0x09]

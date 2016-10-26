@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from struct import unpack
 from R305 import generateHeader, header, address
 

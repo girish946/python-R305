@@ -1,14 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from R305 import generateHeader, header, address
+import DataPacket
 
 identifire = {1:"command packet",
               2: "data packet",
               7:"acknokedge packet",
               8:"end of data packte"}
 
-confirmation_codes = {0:"storage success",
+confirmation_codes = {0:"ready to transfer the following data packet.",
                       1:"error while reciving packet",
-                      0x0b:"addressing PageId is beyond the finger library.",
-                      0x18:"error while writing flash."}
+                      0x0d:"error when uploading datapacket."}
 
 
 
@@ -20,6 +23,7 @@ def parse(s):
     recived_length = s[7:9]
     recived_c_code = s[9]
     recived_c_sum = s[10:11]
+    recived_data_packet = s[12:]
     if( header == [int(ord(c)) for c in recived_header]):
         if( address == [int(ord(c)) for c in recived_address]):
 
@@ -34,16 +38,11 @@ def parse(s):
             #print ([hex(ord(c)) for c in recived_length])
 
             print (confirmation_codes[int(ord(recived_c_code))])
+            DataPacket.parse(recived_data_packet)
             
-    return confirmation_codes[int(ord(recived_c_code))]
+    return "ok"
 
 
 
-def getHeader(buf, pageid):
-    data =[0x01, 0x00, 0x06 ,0x06,buf, pageid/100, pageid%100]
-    csum = sum(data)
-    cs1 = csum/100
-    cs2 = csum%100
-    data.append(cs1)
-    data.append(cs2)
-    return generateHeader()+ data
+def getHeader():
+    return generateHeader()+[0x01, 0x00, 0x04 ,0x08, 0x01, 0x00, 0x0e]

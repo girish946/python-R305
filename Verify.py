@@ -1,19 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import serial
 import time
+import sys
 
-import genImg, Img2Tz, Search
+from r305 import genImg, Img2Tz, Search
 
-ser = serial.Serial('/dev/ttyAMA0')
-
-
-def setBaud():
+def setBaud(ser):
     ser.baudrate = 57600
 
-def write():
+def write(ser):
 
     
     #first finger scan
-    setBaud()    
+    setBaud(ser)    
     data = genImg.getHeader()
     ser.write(bytearray(data));
     time.sleep(1)
@@ -21,7 +22,7 @@ def write():
     print([hex(ord(c)) for c in s])
     genImg.parse(s)
     # generate character file of the finger image.
-    setBaud()
+    setBaud(ser)
     data = Img2Tz.getHeader(0x01)
     ser.write(bytearray(data));
     time.sleep(1)
@@ -29,7 +30,7 @@ def write():
     print([hex(ord(c)) for c in s])
     Img2Tz.parse(s)
 
-    setBaud()
+    setBaud(ser)
     data = Search.getHeader(0x01, 0x0000, 0x0064)
     ser.write(bytearray(data));
     time.sleep(1)
@@ -38,4 +39,5 @@ def write():
     print Search.parse(s)
 
 
-write()
+ser = serial.Serial(sys.argv[1], sys.argv[2])
+write(ser)
