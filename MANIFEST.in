@@ -1,0 +1,2 @@
+include MANIFEST.in README.md setup.py LICENSE Verify.py requirements.txt
+recursive-include r305 img *.py *.jpg
