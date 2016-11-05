@@ -1,23 +1,23 @@
 # Created by pyp2rpm-3.1.3
-%global pypi_name python-R305
+%global pypi_name R305
 
 
 Name:           python-%{pypi_name}
 Version:        1.0.0
 Release:        1%{?dist}
-Summary:        python api for R305 finger print module
+Summary:        python API for R305 finger print module
 
 License:        GPLv3+
 URL:            https://github.com/girish946/pthon-R305
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/R/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 
 %description
-python api for R305 finger print module over UART. Each module contains getHeader() and parse() methods. getHeader() generates the frame for the command for the specific instruction. The parse() for theat module parses the response of the command and shows the result.
+python API for R305 finger print module over UART. Each module contains getHeader() and parse() methods. getHeader() generates the frame for the command for the specific instruction. The parse() for theat module parses the response of the command and shows the result.
 
 %package -n     python2-%{pypi_name}
-Summary:        python api for R305 finger print module.
+Summary:        python API for R305 finger print module.
 %{?python_provide:%python_provide python2-%{pypi_name}}
 
 BuildRequires:  python-setuptools
@@ -25,7 +25,7 @@ BuildRequires:  python2-devel
  
 Requires:       pyserial
 %description -n python2-%{pypi_name}
-python api for R305 finger print module over UART.
+python API for R305 finger print module over UART.
 
 
 %prep
@@ -50,7 +50,7 @@ sed -i -e '/^#!\//, 1d' r305/*.py
 %license LICENSE
 %doc 
 %{_bindir}/Verify.py
-%{python2_sitelib}/%{pypi_name}/
+%{python2_sitelib}/r305/
 %{python2_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info/
 
 

@@ -5,7 +5,7 @@ import os
 from setuptools import setup
 
 setup(
-    name = 'python-R305' ,
+    name = 'R305' ,
     version = '1.0.0' ,
     author = 'girish joshi' ,
     author_email = 'girish946@gmail.com' ,
