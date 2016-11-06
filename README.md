@@ -10,3 +10,13 @@ Fingerprint module over UART.
 
     the parse() for theat module parses the response of the command and shows the result.
 
+## installation
+
+### using pip
+
+    $ pip install R305
+
+### For Fedora and centos
+
+    $ dnf copr enable girish946/R305
+    $ dnf install python-R305
