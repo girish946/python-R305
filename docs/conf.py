@@ -51,8 +51,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python-R305'
-copyright = u'2017, girish joshi'
-author = u'girish joshi'
+copyright = u'2017, Girish Joshi'
+author = u'Girish Joshi'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -262,7 +262,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Python-R305.tex', u'Python-R305 Documentation',
-     u'girish joshi', 'manual'),
+     u'Girish Joshi', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
