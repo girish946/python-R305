@@ -23,4 +23,4 @@ Fingerprint module over UART.
 
 ## Documentation
 
-the documentation for Python-R305 package can be found at[rtfd.org](http://python-r305-documentation.readthedocs.io/en/latest/index.html)
+the documentation for Python-R305 package can be found at [rtfd.org](http://python-r305-documentation.readthedocs.io/en/latest/index.html)
