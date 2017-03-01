@@ -20,3 +20,7 @@ Fingerprint module over UART.
 
     $ dnf copr enable girish946/R305
     $ dnf install python-R305
+
+## Documentation
+
+the documentation for Python-R305 package can be found at [rtfd.org](http://python-r305-documentation.readthedocs.io/en/latest/index.html)
