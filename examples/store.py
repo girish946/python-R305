@@ -1,6 +1,6 @@
 import serial
 import time
-from r305 import genImg, Img2Tz, RegModel, TemplateNum, Store
+from r305 import genImg, Img2Tz, RegModel, TemplateNum, Store, Match
 import sys
 
 ser = serial.Serial(sys.argv[1])
@@ -59,49 +59,60 @@ def write(callback= None):
     print([hex(ord(c)) for c in s])
     Img2Tz.parse(s)
 
+    data = Match.getHeader()
+    #print "mathc header is ", [hex(ord(c)) for c in data]
+    print "the length of match header is ", len(data)
+    ser.write(bytearray(data));
+    time.sleep(1)
+    s = ser.read(ser.inWaiting())
+    print([hex(ord(c)) for c in s])
+    match, match_score = Match.parse(s)
+    if match == 0:
+        #create RegModel
+        callback("creating reg model")
+    
+        data = RegModel.getHeader()
+        ser.write(bytearray(data));
+        time.sleep(1)
+        s = ser.read(ser.inWaiting())
+        print([hex(ord(c)) for c in s])
+        RegModel.parse(s)
+        #getTemplateNumber
+        callback("getting template number")
+    
+        data = TemplateNum.getHeader()
+        ser.write(bytearray(data));
+        time.sleep(1)
+        s = ser.read(ser.inWaiting())
+        print([hex(ord(c)) for c in s])
+        num = TemplateNum.parse(s)
+        callback("template num is "+str(num))
+        print "recived template Number is "+ str(num)
+    
+    
+        data = Store.getHeader(0x01,int(num)+1 )
+        print([hex(c) for c in data])
+        ser.write(bytearray(data));
+        time.sleep(1)
+        s = ser.read(ser.inWaiting())
+        print([hex(ord(c)) for c in s])
+        print len(s)
+        Store.parse(s)
 
-
-    #create RegModel
-    callback("creating reg model")
-    
-    data = RegModel.getHeader()
-    ser.write(bytearray(data));
-    time.sleep(1)
-    s = ser.read(ser.inWaiting())
-    print([hex(ord(c)) for c in s])
-    RegModel.parse(s)
-    #getTemplateNumber
-    callback("getting template number")
-    
-    data = TemplateNum.getHeader()
-    ser.write(bytearray(data));
-    time.sleep(1)
-    s = ser.read(ser.inWaiting())
-    print([hex(ord(c)) for c in s])
-    num = TemplateNum.parse(s)
-    callback("template num is "+str(num))
-    print "recived template Number is "+ str(num)
-    
-    
-    data = Store.getHeader(0x01,int(num)+1 )
-    print([hex(c) for c in data])
-    ser.write(bytearray(data));
-    time.sleep(1)
-    s = ser.read(ser.inWaiting())
-    print([hex(ord(c)) for c in s])
-    print len(s)
-    Store.parse(s)
-
-    #getTemplateNumber
-    data = TemplateNum.getHeader()
-    ser.write(bytearray(data));
-    time.sleep(1)
-    s = ser.read(ser.inWaiting())
-    print([hex(ord(c)) for c in s])
-    num = TemplateNum.parse(s)
-    callback("template stored at "+str(num + 1))
-    print "recived template Number is "+ str(num)
-    return
+        #getTemplateNumber
+        data = TemplateNum.getHeader()
+        ser.write(bytearray(data));
+        time.sleep(1)
+        s = ser.read(ser.inWaiting())
+        print([hex(ord(c)) for c in s])
+        num = TemplateNum.parse(s)
+        callback("template stored at "+str(num + 1))
+        print "recived template Number is "+ str(num)
+        return
+        
+    else:
+        print "the two fingers don't match"
+        return
     
     
     
