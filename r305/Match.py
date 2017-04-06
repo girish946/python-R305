@@ -19,7 +19,6 @@ confirmation_codes = {0:"Templates of the two buffers are matching!",
                      }
                      
 def parse(s):
-    print len(s)
     recived_header = s[:2]
     recived_address = s[2:6]
     recived_id = s[6]
@@ -35,5 +34,4 @@ def parse(s):
 
 def getHeader():
     data = [0x01, 0x00, 0x03, 0x03, 0x00, 0x07 ]
-    #print "generating header ", [hex(c) for c in generateHeader()+ data], len([hex(c) for c in generateHeader()+ data])
     return generateHeader()+ data
