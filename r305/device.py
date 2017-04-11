@@ -1,6 +1,7 @@
 import serial
 import time
 from r305 import *
+from __future__ import print_function
 
 def getHeader(command, params=None):
 
@@ -80,7 +81,7 @@ class R305:
         self.ser.write(bytearray(data))
         time.sleep(1)
         data = self.ser.read(self.ser.inWaiting())
-        print([hex(ord(c)) for c in data])
+        #print([hex(ord(c)) for c in data])
         return parse(data)
            
 
@@ -97,7 +98,7 @@ class R305:
     def DeleteAll(self):
 
         data = getHeader('Empty')
-        print([hex(c) for c in data])
+        #print([hex(c) for c in data])
         result = self.execute(data)
         return result['status']
 
@@ -113,14 +114,14 @@ class R305:
     def Img2Tz(self, bufferId=0x01):
 
         data = getHeader('Img2Tz', params=[bufferId])
-        print([hex(c) for c in data])
+        #print([hex(c) for c in data])
         result = self.execute(data)
         return result
 
     def Match(self):
 
         data = getHeader('Match')
-        print([hex(c) for c in data])
+        #print([hex(c) for c in data])
         result = self.execute(data)
         #print(len(result['Data']))
         return result
@@ -128,7 +129,7 @@ class R305:
     def RegModel(self):
 
         data = getHeader('RegModel')
-        print([hex(c) for c in data])
+        #print([hex(c) for c in data])
         result = self.execute(data)
         #print(len(result['Data']))
         return result
@@ -140,7 +141,7 @@ class R305:
             templateNum = self.TemplateNum()
         data = getHeader('Store',
                         params=[bufferId, templateNum/100, templateNum%100])
-        print([hex(c) for c in data])
+        #print([hex(c) for c in data])
         result = self.execute(data)
         return result
 
@@ -155,6 +156,80 @@ class R305:
 
         data = getHeader('Search', params=[bufferId, startPage1, startPage2,
                                            pageNum1, pageNum2])
-        print([hex(c) for c in data])
+        #print([hex(c) for c in data])
         result = self.execute(data)
         return result
+
+
+    def DeletChar(self, pageId=None, n=0):
+
+        pageByte1 = pageId / 100
+        pageByte2 = pageId % 100
+
+        nop1 = n / 100
+        nop2 = n % 100
+        data = getHeader('DeletChar', params=[pageByte1, pageByte2, nop1, nop2])
+        result = self.execute(data)
+        return result
+
+
+    def UpChar(self, bufferId=0x01):
+
+        data = getHeader('UpChar', params=[bufferId])
+        result = self.execute(data)
+        print(result)
+        charData = self.ser.read(ser.inWaiting())
+        char = [hex(ord(i)) for i in charData]
+        print(char)
+        return result, charData
+
+
+    def DownChar(self, bufferId=0x01, pageNumber=0x0000):
+
+        pageByte1 = pageNumber / 100
+        pageByte2 = pageNumber % 100
+        data = getHeader('DownChar', params[bufferId, pageByte1, pageByte2])
+        result = self.execute(data)
+        return result
+
+
+    def StoreFingerPrint(self, callback=print, IgnoreChecksum=True,
+                         message="put the finger again ")
+                        ):
+
+        if IgnoreChecksum:
+
+            slef.GenImg()
+            self.Img2Tz(bufferId=0x01)
+            callback(message)
+            self.GenImg()
+            self.Img2Tz(bufferId=0x02)
+            matchResult = self.Match()
+
+            if matchResult['status'] == 0x00:
+                searchResult = self.Search(0x01)
+                if searchResult['status'] == 0x00:                    
+                    self.RegModel()
+                    return self.Store()
+                elif searchResult['status'] == 0x09:
+                    return "finger already present."
+                else:
+                    return "error while reciving packet"
+
+            elif matchResult['status'] == 0x08:
+                return "templates of the two fingers not matching"
+
+            else:
+                return "error while reciving packet"
+        else:
+
+            slef.GenImg()
+            self.Img2Tz(bufferId=0x01)
+            callback(message)
+            self.GenImg()
+            self.Img2Tz(bufferId=0x02)
+            self.Match()
+            self.Search(0x01)
+            self.RegModel()
+            return self.Store()
+
