@@ -4,6 +4,16 @@ from r305 import *
 from __future__ import print_function
 
 def getHeader(command, params=None):
+    """
+    Generates the command packet for the given instruction of R305.
+
+    :params command: the command for which the packet/header is to be generated.
+
+    :params params: extra parameters if the command need them.
+    for example for Img2Tz command you have to specify the buffer Id to store the template.
+
+    Returns command packet for the given instruction, this is a list of bytes.
+    """
 
     if command in instruction:
         head = header+address
@@ -20,6 +30,16 @@ def getHeader(command, params=None):
         return pack
 
 def getChecksum(data):
+
+    """
+    calculates the checksum of the packet.
+
+    :param data: the datapacket
+
+    Returns the list containing two bytes which are the checksum of the given
+    packet.
+    """
+
     frame = data[6:]
     csum = sum(getIntList(frame))
     csum1 = csum / 100
@@ -28,6 +48,15 @@ def getChecksum(data):
     return [csum1, csum2]
 
 def getInt(c):
+
+    """
+    get the integer value of byte.
+
+    :param c: char/byte
+
+    Returns the integer from the byte
+    """
+
     #print(c)
     if type(c) == int:
         return c
@@ -37,9 +66,25 @@ def getInt(c):
         return None
 
 def getIntList(data):
+
+    """
+    Returns the list of ints from the list of chars.
+    """
+
     return [getInt(c) for c in data]
 
 def parse(data):
+
+    """
+    Parses the recived data packet.
+
+    Returns the Dict containing:
+
+        status : whether command executed correctly or not.
+        Csum   : "ok" if checksum is ok and "error" if there is a checksum error
+        Data   : list of bytes if any data is returned by the module.
+
+    """
 
     #print("the length of the recived data is {len}".format(len=len(data)))
 
