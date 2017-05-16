@@ -30,7 +30,6 @@ def getHeader(command, params=None):
         return pack
 
 def getChecksum(data):
-
     """
     calculates the checksum of the packet.
 
@@ -48,7 +47,6 @@ def getChecksum(data):
     return [csum1, csum2]
 
 def getInt(c):
-
     """
     get the integer value of byte.
 
@@ -66,7 +64,6 @@ def getInt(c):
         return None
 
 def getIntList(data):
-
     """
     Returns the list of ints from the list of chars.
     """
@@ -74,7 +71,6 @@ def getIntList(data):
     return [getInt(c) for c in data]
 
 def parse(data):
-
     """
     Parses the recived data packet.
 
@@ -117,12 +113,24 @@ def parse(data):
                         'Data'  :  RecivedDataFrame['Data']}
 
 class R305:
+    """
+    R305 device object. Contain methods for performaing different
+    operations on R305 fingerprint module.
+    :param serialDevice: the tty device to which the R305 is connected.
+    :param Baudrate: the baudrate over which R305 is operated.
+    """
 
     def __init__(self, serialDevice=None, Baudrate=None):
 
         self.ser = serial.Serial(serialDevice, Baudrate)
 
     def execute(self, data):
+        """
+        Executed the command on the fingerprint module.
+        :param data: the data packet.
+        writes the data packet to the serial device and parses the result.
+        """
+        
         self.ser.write(bytearray(data))
         time.sleep(1)
         data = self.ser.read(self.ser.inWaiting())
@@ -131,6 +139,10 @@ class R305:
            
 
     def TemplateNum(self):
+        """
+        Retrives the current template number from the fingerprint module.
+        """
+        
         data = getHeader('TemplateNum')
         #print([hex(c) for c in data])
         result = self.execute(data)
@@ -141,7 +153,10 @@ class R305:
             return command_ack[result['status']]
 
     def DeleteAll(self):
-
+        """
+        Deletes all of the existing templates from the database.
+        """
+        
         data = getHeader('Empty')
         #print([hex(c) for c in data])
         result = self.execute(data)
@@ -149,7 +164,10 @@ class R305:
 
 
     def GenImg(self):
-
+        """
+        Detects a finger and stores the finger image in the image buffer.
+        """
+        
         data = getHeader('GenImg')
         #print([hex(c) for c in data])
         result = self.execute(data)
@@ -157,7 +175,12 @@ class R305:
         return command_ack[result['status']]
 
     def Img2Tz(self, bufferId=0x01):
-
+        """
+        Generates character file from the original finger image in ImageBuffer and
+        store the file in CharBuffer1 or CharBuffer2.
+        :param bufferId: the CharBuffer where the fingerprint has to be saved.
+        """
+        
         data = getHeader('Img2Tz', params=[bufferId])
         #print([hex(c) for c in data])
         result = self.execute(data)
