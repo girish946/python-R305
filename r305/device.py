@@ -176,8 +176,8 @@ class R305:
 
     def Img2Tz(self, bufferId=0x01):
         """
-        Generates character file from the original finger image in ImageBuffer and
-        store the file in CharBuffer1 or CharBuffer2.
+        Generates character file from the original finger image in
+        ImageBuffer and store the file in CharBuffer1 or CharBuffer2.
         :param bufferId: the CharBuffer where the fingerprint has to be saved.
         """
         
@@ -187,7 +187,11 @@ class R305:
         return result
 
     def Match(self):
-
+        """
+        Carris out precise matching of templates from CharBuffer1 and CharBuffer2.
+        Returns  Matching result.
+        """
+        
         data = getHeader('Match')
         #print([hex(c) for c in data])
         result = self.execute(data)
@@ -195,7 +199,12 @@ class R305:
         return result
 
     def RegModel(self):
-
+        """
+        Combines information of character files from CharBuffer1 and
+        CharBuffer2 and generates a template which is stroed back in
+        both CharBuffer1 and CharBuffer2
+        """
+        
         data = getHeader('RegModel')
         #print([hex(c) for c in data])
         result = self.execute(data)
@@ -204,7 +213,13 @@ class R305:
 
 
     def Store(self, bufferId=0x01, templateNum=None):
-
+        """
+        Stores the template of specified buffer (Buffer1/Buffer2) at the 
+        designated location of Flash library.
+        :param bufferId:
+        :param templateNum: the template number.
+        """
+        
         if not templateNum:
             templateNum = self.TemplateNum()
         data = getHeader('Store',
@@ -215,7 +230,14 @@ class R305:
 
 
     def Search(self, bufferId=0x01, startPage=0x0000, pageNum=0x0064):
-
+        """
+        Searches the whole finger library for the template that matches the
+        one in CharBuffer1 or CharBuffer2. When found, PageID will be returned.
+        :param bufferId:
+        :param startPage: two bytes address of starting page.
+        :param pageNum: two bytes address of last page.
+        Returns the PageID where the matching finger is found.
+        """
         startPage1  = startPage / 100
         startPage2  = startPage % 100
 
@@ -230,7 +252,12 @@ class R305:
 
 
     def DeletChar(self, pageId=None, n=0):
-
+        """
+        Deletes a segment (N) of templates of Flash library started from
+        the specified location (or PageID);
+        :param pageId:
+        :param n: segment
+        """
         pageByte1 = pageId / 100
         pageByte2 = pageId % 100
 
@@ -242,7 +269,12 @@ class R305:
 
 
     def UpChar(self, bufferId=0x01):
-
+        """
+        Uploads the character file or template of CharBuffer1/CharBuffer2 to upper
+        computer.
+        :param bufferId:
+        """
+        
         data = getHeader('UpChar', params=[bufferId])
         result = self.execute(data)
         print(result)
@@ -253,7 +285,13 @@ class R305:
 
 
     def DownChar(self, bufferId=0x01, pageNumber=0x0000):
-
+        """
+        Downloads character file or template from upper computer to
+        the specified buffer of Module.
+        :param bufferId:
+        :param pageNumber:
+        """
+        
         pageByte1 = pageNumber / 100
         pageByte2 = pageNumber % 100
         data = getHeader('DownChar', params[bufferId, pageByte1, pageByte2])
@@ -263,7 +301,22 @@ class R305:
 
     def StoreFingerPrint(self, callback=print, IgnoreChecksum=True,
                          message="put the finger again ")
-                        ):
+                        ):             
+        """
+        Performs the complete process for storing a finger into the module.
+        to store a finger the process is.
+            1. scan the finger
+            2. generate a template
+            3. scan the finger again
+            4. generate the second template.
+            5. match the two templates.
+            6. if the templates are matching
+                    store the fingerprint in the specific location in th module.
+                    
+        :param callback: callbackfunction to get the message at each step.
+        :param IgnoreChecksum: ignores the checksum if True
+        :param message: message to be shown while scanning the finger second time.
+        """
 
         if IgnoreChecksum:
 
