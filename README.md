@@ -15,6 +15,42 @@ Fingerprint module over UART.
 
     $ dnf copr enable girish946/R305
     $ dnf install python-R305
+    
+    
+## Usage
+
+To store the fingerprint in to the module
+
+```python
+from r305 import R305
+import sys
+
+device   = sys.argv[1]
+baudrate = sys.argv[2] # the default baudrate for this module is 57600
+
+dev = R305(device, baudrate)
+
+def something(data):
+    x = raw_input(data)
+
+result = dev.StoreFingerPrint(IgnoreChecksum=True, callback=something)
+print(result)
+```
+
+To search fingerprint in the module
+
+```python
+from r305 import R305
+import sys
+
+device   = sys.argv[1]
+baudrate = sys.argv[2] # the default baudrate for this module is 57600
+
+dev = R305(device, baudrate)
+
+result = dev.SearchFingerPrint()
+print(result)
+```
 
 ## Documentation
 

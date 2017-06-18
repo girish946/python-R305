@@ -1,7 +1,8 @@
+from __future__ import print_function
 import serial
 import time
 from r305 import *
-from __future__ import print_function
+
 
 def getHeader(command, params=None):
     """
@@ -94,20 +95,20 @@ def parse(data):
 	    'Csum'    : getIntList(data[-2:]),
     }
 
-    print("parsing lenght {len}".format(len=len(RecivedDataFrame)))
-    print(RecivedDataFrame)
+    #print("parsing lenght {len}".format(len=len(RecivedDataFrame)))
+    #print(RecivedDataFrame)
     if header == RecivedDataFrame['header']:
-        print("header ok")
+        #print("header ok")
         if address == RecivedDataFrame['address']:
-            print('address ok')
+            #print('address ok')
             if getChecksum(data[:-2]) == RecivedDataFrame['Csum']:
-                print("checksum ok")
-                print(command_ack[RecivedDataFrame['Ccode']])
+                #print("checksum ok")
+                #print(command_ack[RecivedDataFrame['Ccode']])
                 return {'status': RecivedDataFrame['Ccode'],
                         'Csum'  : 'ok',
                         'Data'  : RecivedDataFrame['Data']}
             else:
-                print(RecivedDataFrame['Csum'])
+                #print(RecivedDataFrame['Csum'])
                 return {'status': RecivedDataFrame['Ccode'],
                         'Csum'  : 'error',
                         'Data'  :  RecivedDataFrame['Data']}
@@ -226,6 +227,7 @@ class R305:
                         params=[bufferId, templateNum/100, templateNum%100])
         #print([hex(c) for c in data])
         result = self.execute(data)
+        result['template'] = templateNum
         return result
 
 
@@ -299,8 +301,9 @@ class R305:
         return result
 
 
-    def StoreFingerPrint(self, callback=print, IgnoreChecksum=True,
-                         message="put the finger again ")
+    def StoreFingerPrint(self, callback=print, IgnoreChecksum=False,
+                         message="put the finger again ",
+                         templateNum=None
                         ):             
         """
         Performs the complete process for storing a finger into the module.
@@ -316,41 +319,135 @@ class R305:
         :param callback: callbackfunction to get the message at each step.
         :param IgnoreChecksum: ignores the checksum if True
         :param message: message to be shown while scanning the finger second time.
+        :param bufferId: the bufferId for the character file.
+        :param templateNum: location where the fingerprint has to be stored. 
         """
 
         if IgnoreChecksum:
 
-            slef.GenImg()
+            self.GenImg()
             self.Img2Tz(bufferId=0x01)
             callback(message)
             self.GenImg()
             self.Img2Tz(bufferId=0x02)
             matchResult = self.Match()
-
+            #print(matchResult)
             if matchResult['status'] == 0x00:
                 searchResult = self.Search(0x01)
-                if searchResult['status'] == 0x00:                    
+                
+                if searchResult['status'] == 0x09:                  
+                  
                     self.RegModel()
-                    return self.Store()
-                elif searchResult['status'] == 0x09:
-                    return "finger already present."
+                    result = self.Store(templateNum=templateNum)
+                    
+                    if result['status'] == 0x00:
+                        return result
+                        
+                    else :
+                        #print("store")
+                        return command_ack[result['status']]
                 else:
-                    return "error while reciving packet"
-
-            elif matchResult['status'] == 0x08:
-                return "templates of the two fingers not matching"
-
+                    if searchResult['status'] == 0x00:
+                        return "fingerprint already present"
+                    else:
+                        return command_ack[searchResult['status']]
             else:
-                return "error while reciving packet"
+                #print("match")
+                return command_ack[matchResult['status']]
         else:
 
-            slef.GenImg()
-            self.Img2Tz(bufferId=0x01)
-            callback(message)
             self.GenImg()
-            self.Img2Tz(bufferId=0x02)
-            self.Match()
-            self.Search(0x01)
-            self.RegModel()
-            return self.Store()
-
+            data = self.Img2Tz(bufferId=0x01)
+            if data['Csum'] == 'ok':
+            
+                callback(message)
+                self.GenImg()
+                data = self.Img2Tz(bufferId=0x02)
+                
+                if data['Csum'] == 'ok':
+                
+                    matchResult = self.Match()
+                    if (matchResult['Csum'] == 'ok' and
+                        matchResult['status'] == 0x00):
+                        searchResult = self.Search(0x01)
+                        
+                        if (searchResult['Csum'] == 'ok' and
+                            searchResult['status'] == 0x09):
+                            data = self.RegModel()
+                            
+                            if data['Csum'] == 'ok':
+                               result = self.Store(templateNum=templateNum)
+                               if result['Csum'] == 'ok':
+                                   return result
+                                   
+                               else:
+                                   return "Checksum Error"
+                            else:
+                                return "Checksum Error"
+                                
+                        elif not searchResult['status'] == 0x00:
+                            return command_ack[searchResult['status']]
+                            
+                        elif searchResult['status'] == 0x00:
+                            return "fingerprint already present"
+                            
+                        else:
+                            return "Checksum Error"
+                            
+                    elif not matchResult['status'] == 0x00:
+                        return command_ack[matchResult['status']]
+                        
+                    else:
+                        
+                        return "Checksum Error"
+                else:
+                    return "Checksum Error"
+            else:
+                return "Checksum Error"
+            
+            
+    def SearchFingerPrint(self, IgnoreChecksum=False):
+   
+       """
+       Searches the fingerprint in the module.
+       Single method which.
+       1. scans the fingerprint
+       2. generates the character file
+       3. searches this character file in the module
+       """
+   
+       if IgnoreChecksum:
+           finger_on_sensor = self.GenImg()
+           if finger_on_sensor == 'commad execution complete':
+               self.Img2Tz(bufferId=0x01)
+               result = self.Search(bufferId=0x01)
+               if result['status'] == 0x00:
+                   result['pageid']     = int(ord(result['Data'][0]))
+                   result['matchstore'] = int(ord(result['Data'][1]))
+                   return result
+               
+               else:
+                   return command_ack[result['status']]
+           else:
+               return finger_on_sensor    
+       else:
+       
+           finger_on_sensor = self.GenImg()
+           if finger_on_sensor == 'commad execution complete':
+               data = self.Img2Tz(bufferId=0x01)
+               if data['Csum'] == 'ok':
+           
+                   result = self.Search(bufferId=0x01)
+                   if result['Csum'] == 'ok':
+                       if result['status'] == 0x00:
+                           result['pageid']     = int(ord(result['Data'][0]))
+                           result['matchstore'] = int(ord(result['Data'][1]))
+                           return result
+                       else:
+                           return command_ack[result['status']]
+                   else:
+                       return "Checksum Error"
+               else:
+                   return "Checksum Error"
+           else:
+               return finger_on_sensor
