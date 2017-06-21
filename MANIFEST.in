@@ -1,2 +1,2 @@
-include MANIFEST.in README.md setup.py LICENSE Verify.py requirements.txt
-recursive-include r305 img *.py *.jpg
+include MANIFEST.in README.md setup.py LICENSE requirements.txt
+recursive-include r305 img doc examples *.py *.jpg *.rst *.css *.css_t *.html *.htm *.conf *.png

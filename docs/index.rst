@@ -6,7 +6,9 @@
 Welcome to Python-R305's documentation!
 =======================================
 
-R305 is a low cose fingerprint identification module. It can store upto 256 fingerprints in it. which makes it a grate option for academic projects.
+R305 is a low cose fingerprint identification module.
+It can store upto 256 fingerprints in it. which makes it a grate option
+for academic projects.
 
 Contents:
 
