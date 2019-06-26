@@ -1,7 +1,7 @@
 from __future__ import print_function
 import serial
 import time
-from r305 import *
+from .r305 import *
 
 
 def getHeader(command, params=None):
