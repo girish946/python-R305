@@ -16,15 +16,15 @@ BuildArch:      noarch
 %description
 python API for R305 finger print module over UART. Each module contains getHeader() and parse() methods. getHeader() generates the frame for the command for the specific instruction. The parse() for theat module parses the response of the command and shows the result.
 
-%package -n     python2-%{pypi_name}
+%package -n     python-%{pypi_name}
 Summary:        python API for R305 finger print module.
-%{?python_provide:%python_provide python2-%{pypi_name}}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 
-BuildRequires:  python-setuptools
-BuildRequires:  python2-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-devel
  
 Requires:       pyserial
-%description -n python2-%{pypi_name}
+%description -n python-%{pypi_name}
 python API for R305 finger print module over UART.
 
 
@@ -36,17 +36,17 @@ sed -i -e '/^#!\//, 1d' r305/*.py
 
 
 %build
-%py2_build
+%py_build
 
 
 %install
 # Must do the subpackages' install first because the scripts in /usr/bin are
 # overwritten with every setup.py install.
 
-%py2_install
+%py_install
 
 
-%files -n python2-%{pypi_name}
+%files -n python-%{pypi_name}
 %license LICENSE
 %doc 
 %{_bindir}/Verify.py
@@ -55,6 +55,8 @@ sed -i -e '/^#!\//, 1d' r305/*.py
 
 
 %changelog
+* Fri Nov 20 2020 girish joshi <girish946@gmail.com> - 1.0.0
+- Specfile corrected for building on fedora 33
 * Sat Nov 5 2016 girish joshi <girish946@gmail.com> - 1.0.0
 - initial package is created.
 - basic functionality of r305 added.
